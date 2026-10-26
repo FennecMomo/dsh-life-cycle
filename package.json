@@ -1,7 +1,7 @@
 {
   "name": "dsh-life-cycle",
-  "version": "0.2.0",
-  "description": "生命节奏（dsh-life-cycle）：给 DSH 里的小夜一个会累、会睡、会发呆的生活循环。按精力值推动，做完一件事就定下一次闹钟，闹钟响了才醒过来决定下一件事。",
+  "version": "0.3.0",
+  "description": "生命节奏（dsh-life-cycle）：给 DSH 里的小夜一个会累、会睡、会做梦的生活循环。精力、睡眠、做梦由插件的生理引擎在 host 侧持续计算，闹钟响了才把 AI 叫醒去决定这一轮做什么。",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -12,9 +12,13 @@
     "ai-companion"
   ],
   "main": "lib/host.js",
+  "scripts": {
+    "test": "node --test test/body.test.mjs"
+  },
   "exports": {
     ".": "./lib/host.js",
     "./client": "./lib/client.js",
+    "./body": "./lib/body.js",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
