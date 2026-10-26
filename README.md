@@ -7,6 +7,7 @@
 
 - 包名：`dsh-life-cycle`
 - 版本：0.2.0
+- 仓库：https://github.com/FennecMomo/dsh-life-cycle
 - host 侧：`lib/host.js`　client 侧：`lib/client.js`（设置里一页「生命节奏」）
 - 挂载：`cordis.patch.yml` 里的一条 `insert: life-cycle`
 
@@ -34,7 +35,7 @@
 // <profile>/package.json
 {
   "dependencies": {
-    "dsh-life-cycle": "link:D:/Projects/dsh-plugins/third-party/dsh-life-cycle"
+    "dsh-life-cycle": "link:D:/Projects/dsh-plugins/dsh-life-cycle"
   },
   "dsh": {
     "profile": {
