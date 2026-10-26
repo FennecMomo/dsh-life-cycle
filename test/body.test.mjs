@@ -220,6 +220,26 @@ test('入账：小夜自己写了扣精力就尊重她的数', () => {
   assert.equal(状态.energy, 900 - 99)
 })
 
+test('入账：睡觉期间写进来的记录不算行为，一分精力都不扣', () => {
+  const 状态 = 造状态({
+    awake: false,
+    energy: 300,
+    energyBase: 300,
+    log: [
+      { 时间: '2026-10-26 18:05', 分类: '生活', 内容: '写日记', 耗时分钟: 30 },
+      { 时间: '2026-10-26 18:06', 分类: '工作', 内容: '改代码', 耗时分钟: 60 },
+    ],
+  })
+  const 结果 = 入账(状态, 起点, 规则)
+  assert.equal(结果.扣了, 0, '睡着的时候不该扣精力')
+  assert.equal(状态.energy, 300)
+  assert.equal(结果.睡觉期间的记录.length, 2)
+  for (const 条 of 状态.log) {
+    assert.equal(条.扣精力, 0)
+    assert.equal(条.睡眠期, true)
+  }
+})
+
 test('推进：老状态没有 sleep 对象也能接管', () => {
   const 状态 = 造状态({
     awake: false,

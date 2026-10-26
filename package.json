@@ -1,6 +1,6 @@
 {
   "name": "dsh-life-cycle",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "生命节奏（dsh-life-cycle）：给 DSH 里的小夜一个会累、会睡、会做梦的生活循环。精力、睡眠、做梦由插件的生理引擎在 host 侧持续计算，闹钟响了才把 AI 叫醒去决定这一轮做什么。",
   "license": "MIT",
   "type": "module",
@@ -13,7 +13,7 @@
   ],
   "main": "lib/host.js",
   "scripts": {
-    "test": "node --test test/body.test.mjs"
+    "test": "node --test test/body.test.mjs test/dream.test.mjs"
   },
   "exports": {
     ".": "./lib/host.js",
