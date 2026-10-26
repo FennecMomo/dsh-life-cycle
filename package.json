@@ -1,6 +1,6 @@
 {
   "name": "dsh-life-cycle",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "生命节奏（dsh-life-cycle）：给 DSH 里的小夜一个会累、会睡、会做梦的生活循环。精力、睡眠由插件的生理引擎在 host 侧持续计算；做梦时抽一段 100~500 字的旧上下文，另开临时会话让她自己写场景、再以第一人称经历一遍，记进梦境文件后归档，醒来只交还随机一部分。",
   "license": "MIT",
   "type": "module",
