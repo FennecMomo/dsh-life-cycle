@@ -7,7 +7,7 @@
 //
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { 抽规则, 对齐, 入账, 开睡, 推进, 迁移, 默认规则 } from '../lib/body.js'
+import { 抽规则, 对齐, 入账, 开睡, 推进, 迁移, 默认规则, 该补闹钟 } from '../lib/body.js'
 
 const 起点 = Date.parse('2026-10-26T15:00:00+08:00')
 const 分钟 = 60 * 1000
@@ -294,4 +294,41 @@ test('迁移：老账本不重复扣钱，睡眠被接管，满格也不立刻�
 
   const 到点 = 推进(老, 起点 + 7 * 小时, 规则, 恒(0.99))
   assert.equal(到点[0].类型, '到点')
+})
+
+// ---------- 兜底闹钟：醒着却没定闹钟，插件得把她叫回来 ----------
+
+test('该补闹钟：醒着、nextWakeAt 空着、已经过了宽限期 → 补', () => {
+  const 状态 = { awake: true, nextWakeAt: null, lastWakeAt: new Date(起点).toISOString() }
+  assert.equal(该补闹钟(状态, 起点 + 11 * 分钟), true, '11 分钟已经超过 10 分钟宽限')
+})
+
+test('该补闹钟：刚被叫醒还在宽限期里 → 先不补（给她自己写的机会）', () => {
+  const 状态 = { awake: true, nextWakeAt: null, lastWakeAt: new Date(起点).toISOString() }
+  assert.equal(该补闹钟(状态, 起点 + 5 * 分钟), false)
+})
+
+test('该补闹钟：她自己定了闹钟 → 不补', () => {
+  const 状态 = {
+    awake: true,
+    nextWakeAt: new Date(起点 + 40 * 分钟).toISOString(),
+    lastWakeAt: new Date(起点).toISOString(),
+  }
+  assert.equal(该补闹钟(状态, 起点 + 60 * 分钟), false)
+})
+
+test('该补闹钟：睡着的时候不归它管（睡觉有 until）', () => {
+  const 状态 = { awake: false, nextWakeAt: null, lastWakeAt: new Date(起点).toISOString() }
+  assert.equal(该补闹钟(状态, 起点 + 5 * 小时), false)
+})
+
+test('该补闹钟：没有 lastWakeAt 就看 lastUpdate；两个都没有就直接补', () => {
+  assert.equal(该补闹钟({ awake: true, lastUpdate: new Date(起点).toISOString() }, 起点 + 11 * 分钟), true)
+  assert.equal(该补闹钟({ awake: true, lastUpdate: new Date(起点).toISOString() }, 起点 + 2 * 分钟), false)
+  assert.equal(该补闹钟({ awake: true }, 起点), true, '什么时间参照都没有时，立刻补一个')
+})
+
+test('该补闹钟：nextWakeAt 是坏字符串，当成没定', () => {
+  const 状态 = { awake: true, nextWakeAt: '不是时间', lastWakeAt: new Date(起点).toISOString() }
+  assert.equal(该补闹钟(状态, 起点 + 30 * 分钟), true)
 })
