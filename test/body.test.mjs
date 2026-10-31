@@ -7,7 +7,7 @@
 //
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { 抽规则, 对齐, 入账, 开睡, 推进, 迁移, 默认规则, 该补闹钟 } from '../lib/body.js'
+import { 抽规则, 对齐, 入账, 开睡, 推进, 迁移, 默认规则, 该补闹钟, 检查清单文本 } from '../lib/body.js'
 
 const 起点 = Date.parse('2026-10-26T15:00:00+08:00')
 const 分钟 = 60 * 1000
@@ -331,4 +331,46 @@ test('该补闹钟：没有 lastWakeAt 就看 lastUpdate；两个都没有就直
 test('该补闹钟：nextWakeAt 是坏字符串，当成没定', () => {
   const 状态 = { awake: true, nextWakeAt: '不是时间', lastWakeAt: new Date(起点).toISOString() }
   assert.equal(该补闹钟(状态, 起点 + 30 * 分钟), true)
+})
+
+// ---------- 行为清单编辑器：保存前的把关 ----------
+
+test('检查清单文本：正常的清单能过，并且数得出分类和硬规矩', () => {
+  const 原文 = JSON.stringify({
+    分类: { 工作: { 概率: 0.5 }, 生活: { 概率: 0.25 }, 娱乐: { 概率: 0.3 } },
+    硬规矩: ['不许偷懒', '要记账'],
+    决策流程: ['1. 看状态'],
+  })
+  const 结果 = 检查清单文本(原文)
+  assert.equal(结果.能用, true)
+  assert.equal(结果.错误, '')
+  assert.deepEqual(结果.分类, ['工作', '生活', '娱乐'])
+  assert.equal(结果.硬规矩条数, 2)
+  assert.deepEqual(结果.警告, [])
+})
+
+test('检查清单文本：JSON 写坏要拦住并说明原因', () => {
+  const 结果 = 检查清单文本('{ "分类": { "工作": 1 }, }')
+  assert.equal(结果.能用, false)
+  assert.ok(结果.错误.includes('JSON'), '错误里要说清是格式问题：' + 结果.错误)
+})
+
+test('检查清单文本：最外层不是对象也要拦（数组 / 字符串 / 数字）', () => {
+  for (const 原文 of ['[]', '"清单"', '123', 'null']) {
+    const 结果 = 检查清单文本(原文)
+    assert.equal(结果.能用, false, 原文 + ' 不该通过')
+  }
+})
+
+test('检查清单文本：空内容直接判不能用', () => {
+  assert.equal(检查清单文本('').能用, false)
+  assert.equal(检查清单文本('   \n ').能用, false)
+})
+
+test('检查清单文本：没有分类/硬规矩时不拦，但要给警告', () => {
+  const 结果 = 检查清单文本('{"说明":"空壳"}')
+  assert.equal(结果.能用, true)
+  assert.deepEqual(结果.分类, [])
+  assert.equal(结果.硬规矩条数, 0)
+  assert.equal(结果.警告.length, 2)
 })
